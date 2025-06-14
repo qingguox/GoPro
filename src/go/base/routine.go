@@ -108,10 +108,24 @@ func main() {
 	mu.Lock()
 
 	mu.Unlock()
+
+	// 9. go的继承, 是组合形态, 比如父类struct实现，拥有一个接口 stop() , 子类struct 组合了父类, 此时子类{父类对象:父类对象{}}, 后继承了父类的行为
+
+	v := Vehicle{Brand: "Toyata"}
+	c2 := Car{
+		Vehicle: Vehicle{Brand: "Honda"},
+		Model:   "Civic",
+	}
+
+	v.Start()          // Toyata Started
+	c2.Start()         // Honda Civic car Started
+	c2.Vehicle.Start() // Honda Started
 }
 
 func worker(id int, wg *sync.WaitGroup) {
 	defer wg.Done() // Goroutine 完成时调用 Done()
+	//  defer后面的函数只有在当前函数执行完毕后才能执行。
+	// 多个defer出现的时候，它会把defer之后的函数压入一个栈中延迟执行，也就是先进后出(LIFO).
 	Printf("Worker %d started\n", id)
 	Printf("Worker %d finished\n", id)
 }
@@ -153,3 +167,43 @@ func sayRoutine(cnt int) {
 		time.Sleep(100 * time.Millisecond)
 	}
 }
+
+// 基类
+type Vehicle struct {
+	Brand string
+}
+
+func (v *Vehicle) Start() {
+	Println(v.Brand, "started")
+}
+
+// 派生类
+type Car struct {
+	Vehicle // 嵌入
+	Model   string
+}
+
+// 重写
+func (c *Car) Start() {
+	Println(c.Brand, c.Model, "car Started")
+}
+
+// defer的参数是声明时传入的
+func DeferParams() {
+	var age = 10
+	//如果想要追踪值类型的变化可以传入值类型指针
+	defer func(a *int) {
+		Printf("最初如果传入指针,defer内参数为%d\n", *a)
+	}(&age)
+
+	defer func(a int) {
+		Printf("defer内的参数为%d\n", a)
+	}(age)
+
+	age = 25
+	Printf("age已经变成了%d\n", age)
+}
+
+// age已经变成了25
+// defer内的参数为10
+// 最初如果传入指针,defer内参数为25
