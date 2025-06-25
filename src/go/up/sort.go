@@ -70,7 +70,6 @@ func main() {
 	// 1. 定义结构
 	// 2. 实现三个 len ,less, swap方法
 	// 3. 实现自定义方法
-
 }
 
 type StringSort []string
